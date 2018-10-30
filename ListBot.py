@@ -6,13 +6,17 @@ import asyncio
 import re
 
 client = discord.Client()
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content/'
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content'
 @client.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
+    if not os.path.exists(dir_path):
+        print('Content folder does not exist. Creating...')
+        os.mkdir(dir_path)
+    dir_path+='/'
 
 #args = message.content.slice(prefix.length).trim().split(/ +/g);
 #command = args.shift().shift().toLowerCase();
