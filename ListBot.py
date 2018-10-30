@@ -6,6 +6,7 @@ import asyncio
 import re
 
 client = discord.Client()
+dir_path = os.path.dirname(os.path.realpath(__file__))
 @client.event
 async def on_ready():
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content'
