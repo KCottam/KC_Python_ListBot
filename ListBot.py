@@ -6,9 +6,9 @@ import asyncio
 import re
 
 client = discord.Client()
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content'
 @client.event
 async def on_ready():
+    dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content'
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
