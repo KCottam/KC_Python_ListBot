@@ -27,7 +27,7 @@ async def on_ready():
     print('Linux Program TREE is required.')
 
 async def addAList(message):
-    matchedContent = re.compile('!add list (?:\"(\w+)\")').match(message.content)
+    matchedContent = re.compile('!add list (?:\"(.*)\")').match(message.content)
     if matchedContent is not None:
         if  os.path.exists(dir_path+matchedContent[1]) is not False:
             print('Command Failed: List already exists.')
@@ -83,7 +83,7 @@ async def addToSublist(message, matchedContent):
 
 async def removeAList(message):
     print('Trying to remove a list...')
-    matchedContent = re.compile('!remove list (?:\"(\w+)\")').match(message.content)
+    matchedContent = re.compile('!remove list (?:\"(.*)\")').match(message.content)
     if matchedContent is not None:
         if  os.path.exists(dir_path+matchedContent[1]) is not False:
             remove_folder(dir_path+matchedContent[1])
@@ -191,14 +191,15 @@ async def on_message(message):
         f = open("lists","r")
         line = f.readline()
         while line:
-            await client.send_message(message.channel, '**'+line+'**')
+            await client.send_message(message.channel, '_ _ '+line)
             print(line)
             line = f.readline()
             if line == '\n':
                 line = None
         f.close()
         os.remove(os.path.dirname(os.path.realpath(__file__))+'/lists')
-        print('\n')
+        await client.send_message(message.channel, 'End of Content.')        
+        print('End Command\n')
 
         
 
