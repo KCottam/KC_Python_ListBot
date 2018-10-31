@@ -4,6 +4,13 @@ import os.path
 import sys
 import asyncio
 import re
+import shutil
+
+def remove_folder(path):
+    # check if folder exists
+    if os.path.exists(path):
+         # remove if exists
+         shutil.rmtree(path)
 
 client = discord.Client()
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content/'
@@ -17,42 +24,173 @@ async def on_ready():
         print('Content folder does not exist. Creating...')
         os.mkdir(dir_path)
     print('dir_path: '+dir_path)
+    print('Python module TREE is required.')
+
+async def addAList(message):
+    matchedContent = re.compile('!add list (?:\"(\w+)\")').match(message.content)
+    if matchedContent is not None:
+        if  os.path.exists(dir_path+matchedContent[1]) is not False:
+            print('Command Failed: List already exists.')
+            await client.send_message(message.channel, 'List already exists: '+matchedContent[1])
+            return
+        os.makedirs(dir_path+matchedContent[1])
+        print('Made List: '+matchedContent[1])
+        await client.send_message(message.channel, 'Made List: '+matchedContent[1])
+    else:
+        print('Command Failed: Bad Syntax')
+        await client.send_message(message.channel, 'Try again.')
+        await client.send_message(message.channel, 'The command syntax is "!add list "<list name>"')
+
+async def addToList(message, matchedContent):
+    print('Matched regex 1, 2...')
+    if os.path.exists(dir_path+matchedContent[1]):
+        print('List "'+matchedContent[1]+'" exists... ')
+        f = open(dir_path+matchedContent[1]+'/'+matchedContent[2],'w+')
+        f.close()
+        print('Added "'+matchedContent[2]+'" to list "'+matchedContent[1]+'"')
+        await client.send_message(message.channel, 'Added "'+matchedContent[2]+' to list "'+matchedContent[1]+'"')
+    else:
+        print('List "'+matchedContent[1]+'" does not exist.')
+        await client.send_message(message.channel, 'List "'+matchedContent[1]+'" does not exist.')
+
+async def addASublist(message, matchedContent):
+    print('Matched regex 1 list 2...')
+    if os.path.exists(dir_path+matchedContent[1]):
+        print('List "'+matchedContent[1]+'" exists... ')
+        if os.path.exists(dir_path+matchedContent[1]+'/'+matchedContent[2]):
+            print('Sublist "'+matchedContent[2]+'" already exists!')
+            await client.send_message(message.channel, 'Sublist "'+matchedContent[2]+'" already exists!')
+            return
+        os.mkdir(dir_path+matchedContent[1]+'/'+matchedContent[2])
+        print('Added sublist "'+matchedContent[2]+'" to list "'+matchedContent[1]+'"')
+        await client.send_message(message.channel, 'Added sublist "'+matchedContent[2]+'" to list "'+matchedContent[1]+'"')
+
+async def addToSublist(message, matchedContent):
+    print('Matched regex 1, 2, 3...')
+    if os.path.exists(dir_path+matchedContent[1]+'/'+matchedContent[2]):
+        print('Sublist "'+matchedContent[2]+'" exists in list "'+matchedContent[1]+'"...')
+        f = open(dir_path+matchedContent[1]+'/'+matchedContent[2]+'/'+matchedContent[3],'w+')
+        f.close()
+        print('Added "'+matchedContent[3]+'" to sublist "'+matchedContent[2]+'" in list "'+matchedContent[1]+'"')
+        await client.send_message(message.channel, 'Added "'+matchedContent[3]+'" to sublist "'+matchedContent[2]+'" in list "'+matchedContent[1]+'"')
+    else:
+        if os.path.exists(dir_path+matchedContent[1]):
+            print('Sublist "'+matchedContent[2]+'" does not exist in list "'+matchedContent[1]+'"...')
+            await client.send_message(message.channel, 'Sublist "'+matchedContent[2]+'" does not exist in list "'+matchedContent[1]+'"')
+        else:
+            print('List "'+matchedContent[1]+'" does not exist.')
+            await client.send_message(message.channel, 'List "'+matchedContent[1]+'" does not exist.')
+
+async def removeAList(message):
+    print('Trying to remove a list...')
+    matchedContent = re.compile('!remove list (?:\"(\w+)\")').match(message.content)
+    if matchedContent is not None:
+        if  os.path.exists(dir_path+matchedContent[1]) is not False:
+            remove_folder(dir_path+matchedContent[1])
+            print('Removed List: '+matchedContent[1])
+            await client.send_message(message.channel, 'Removed List: '+matchedContent[1])
+            return
+        print('Command Failed: List does not exist.')
+        await client.send_message(message.channel, 'List does not exist: '+matchedContent[1])
+    else:
+        print('Command Failed: Bad Syntax')
+        await client.send_message(message.channel, 'Try again.')
+        await client.send_message(message.channel, 'The command syntax is "!remove list "<list name>"')
+
+async def removeFromList(message, matchedContent):
+    print('Matched regex 1, 2...')
+    if os.path.exists(dir_path+matchedContent[1]+'/'+matchedContent[2]):
+        print('Item "'+matchedContent[2]+'" exists... ')
+        os.remove(dir_path+matchedContent[1]+'/'+matchedContent[2])
+        print('Removed "'+matchedContent[2]+'" from list "'+matchedContent[1]+'"')
+        await client.send_message(message.channel, 'Removed "'+matchedContent[2]+' from list "'+matchedContent[1]+'"')
+    else:
+        print('Item "'+matchedContent[2]+'" does not exist.')
+        await client.send_message(message.channel, 'Item "'+matchedContent[3]+'" does not exist.')
+
+async def removeFromSublist(message, matchedContent):
+    print('Matched regex 1, 2, 3...')
+    if os.path.exists(dir_path+matchedContent[1]+'/'+matchedContent[2]+'/'+matchedContent[3]):
+        print('Item "'+matchedContent[3]+'" exists in sublist "'+matchedContent[2]+'" in list "'+matchedContent[1]+'"...')
+        os.remove(dir_path+matchedContent[1]+'/'+matchedContent[2]+'/'+matchedContent[3])
+        print('Removed "'+matchedContent[3]+'" from sublist "'+matchedContent[2]+'" in list "'+matchedContent[1]+'"')
+        await client.send_message(message.channel, 'Removed "'+matchedContent[3]+'" from sublist "'+matchedContent[2]+'" in list "'+matchedContent[1]+'"')
+    else:
+        print('Item "'+matchedContent[3]+'" does not exist.')
+        await client.send_message(message.channel, 'Item "'+matchedContent[3]+'" does not exist.')
+
+async def removeASublist(message, matchedContent):
+    print('Matched regex 1 list 2...')
+    if os.path.exists(dir_path+matchedContent[1]+'/'+matchedContent[2]):
+        print('Sublist "'+matchedContent[2]+'" exists... ')
+        remove_folder(dir_path+matchedContent[1]+'/'+matchedContent[2])
+        print('Removed List: '+matchedContent[2])
+        await client.send_message(message.channel, 'Removed List: '+matchedContent[2])
+        return
+    print('Command Failed: List does not exist.')
+    await client.send_message(message.channel, 'Sublist does not exist: '+matchedContent[2])
 
 @client.event
 async def on_message(message):
-    print(message.content)
     if message.content.startswith('!add list'):
+        print(message.content+'\n')
         print('Trying to make a list...')
-        matchedContent = re.compile('!add list (?:\"(\w+)\")').match(message.content)
-        if matchedContent is not None:
-            if  os.path.exists(dir_path+matchedContent[1]) is not False:
-                print('Command Failed: List already exists.')
-                await client.send_message(message.channel, 'List already exists: '+matchedContent[1])
-            else:
-                os.makedirs(dir_path+matchedContent[1])
-                print('Made List: '+matchedContent[1])
-                await client.send_message(message.channel, 'Made List: '+matchedContent[1])
-        else:
-            print('Command Failed: Bad Syntax')
-            await client.send_message(message.channel, 'Try again.')
-            await client.send_message(message.channel, 'The command syntax is "!add list "<list name>"')
+        await addAList(message)
+        print('\n')
     elif message.content.startswith('!add'):
+        print(message.content+'\n')
         print('Trying to add to a list...')
+        matchedContent = re.compile('!add \"(.*)\" \"(.*)\" \"(.*)\"').match(message.content)
+        if matchedContent is not None:
+            await addToSublist(message, matchedContent)
+            print('\n')
+            return
         matchedContent = re.compile('!add \"(.*)\" \"(.*)\"').match(message.content)
         if matchedContent is not None:
-            print('Matched regex 1, 2...')
-            if os.path.exists(dir_path+matchedContent[1]):
-                print('List "'+matchedContent[1]+'" exists... ')
-                f = open(dir_path+matchedContent[1]+'/'+matchedContent[2],'w+')
-                f.close()
-                print('Added "'+matchedContent[2]+'" to list "'+matchedContent[1]+'"')
-                await client.send_message(message.channel, 'Added "'+matchedContent[2]+' to list "'+matchedContent[1]+'"')
-            else:
-                print('List "'+matchedContent[1]+'" does not exist.')
-                await client.send_message(message.channel, 'List "'+matchedContent[1]+'" does not exist.')
-        else:
-            print('Command failed: Bad Syntax')
-            await client.send_message(message.channel, 'Try again.')
-            await client.send_message(message.channel, 'The command syntax is "!add "<list>" "<item>"')
+            await addToList(message, matchedContent)
+            print('\n')
+            return
+        matchedContent = re.compile('!add \"(.*)\" list \"(.*)\"').match(message.content)
+        if matchedContent is not None:
+            await addASublist(message, matchedContent)
+            print('\n')
+            return
+        print('Command failed: Bad Syntax\n')
+        await client.send_message(message.channel, 'Command failed: Bad Syntax')
+    elif message.content.startswith('!remove list'):
+        print(message.content+'\n')
+        print('Trying to remove a list...')
+        await removeAList(message)
+        print('\n')
+    elif message.content.startswith('!remove'):
+        print(message.content+'\n')
+        print('Trying to remove from a list...')
+        matchedContent = re.compile('!remove \"(.*)\" \"(.*)\" \"(.*)\"').match(message.content)
+        if matchedContent is not None:
+            await removeFromSublist(message, matchedContent)
+            print('\n')
+            return
+        matchedContent = re.compile('!remove \"(.*)\" \"(.*)\"').match(message.content)
+        if matchedContent is not None:
+            await removeFromList(message, matchedContent)
+            print('\n')
+            return
+        matchedContent = re.compile('!remove \"(.*)\" list \"(.*)\"').match(message.content)
+        if matchedContent is not None:
+            await removeASublist(message, matchedContent)
+            print('\n')
+            return
+        print('Command failed: Bad Syntax\n')
+        await client.send_message(message.channel, 'Command failed: Bad Syntax')
+    elif message.content.startswith('!list'):
+        print(message.content+'\n')
+        print('Displaying Lists...')
+        os.system("tree -H Lists --nolinks -C Content > Lists.html")
+        await client.send_message(message.channel, 'Here is all of the lists.')
+        await client.send_file(message.channel, dir_path+'Lists.html')
+        os.remove(os.path.dirname(os.path.realpath(__file__))+'Lists.html')
+        print('\n')
+
+        
 
 client.run('NDkxNjk0MzA0MTI2MDQyMTEy.DrogKg.PEATf9YqFIMVNEj1c6PE8dqtTKY')
