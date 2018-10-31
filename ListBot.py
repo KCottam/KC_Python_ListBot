@@ -24,7 +24,7 @@ async def on_ready():
         print('Content folder does not exist. Creating...')
         os.mkdir(dir_path)
     print('dir_path: '+dir_path)
-    print('Python module TREE is required.')
+    print('Linux Program TREE is required.')
 
 async def addAList(message):
     matchedContent = re.compile('!add list (?:\"(\w+)\")').match(message.content)
@@ -132,6 +132,7 @@ async def removeASublist(message, matchedContent):
 
 @client.event
 async def on_message(message):
+    message.content = message.content.lower()
     if message.content.startswith('!add list'):
         print(message.content+'\n')
         print('Trying to make a list...')
@@ -185,10 +186,18 @@ async def on_message(message):
     elif message.content.startswith('!list'):
         print(message.content+'\n')
         print('Displaying Lists...')
-        os.system("tree -H Lists --nolinks -C Content > Lists.html")
+        os.system("tree -n -F -a Content | sed 's/├\|─\|│\|└/ /g' > lists")
         await client.send_message(message.channel, 'Here is all of the lists.')
-        await client.send_file(message.channel, dir_path+'Lists.html')
-        os.remove(os.path.dirname(os.path.realpath(__file__))+'Lists.html')
+        f = open("lists","r")
+        line = f.readline()
+        while line:
+            await client.send_message(message.channel, '**'+line+'**')
+            print(line)
+            line = f.readline()
+            if line == '\n':
+                line = None
+        f.close()
+        os.remove(os.path.dirname(os.path.realpath(__file__))+'/lists')
         print('\n')
 
         
