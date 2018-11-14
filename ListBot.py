@@ -202,5 +202,7 @@ async def on_message(message):
         print('End Command\n')
 
         
-
-client.run('NDkxNjk0MzA0MTI2MDQyMTEy.DrogKg.PEATf9YqFIMVNEj1c6PE8dqtTKY')
+f=open("token.txt","r")
+token = client.readline();
+f.close()
+client.run(token)
