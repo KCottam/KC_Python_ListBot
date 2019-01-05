@@ -203,6 +203,6 @@ async def on_message(message):
 
         
 f=open("token.txt","r")
-token = client.readline();
+token = f.readline();
 f.close()
 client.run(token)
