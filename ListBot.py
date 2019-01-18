@@ -202,7 +202,7 @@ async def on_message(message):
         print('End Command\n')
 
         
-f=open("token.txt","r")
-token = client.readline();
+f=open("/home/pi/KC_Python_ListBot/token.txt","r")
+token = f.readline();
 f.close()
 client.run(token)
