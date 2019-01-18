@@ -56,7 +56,7 @@ async def on_message(message):
                 curPath += '/'+content[i]
                 i += 1
             AddFolder(curPath+'/'+content[len(content)-1])
-            await client.send_message(message.channel, 'INFO: Created a list called '+content[len(content_=1)]+'!')
+            await client.send_message(message.channel, 'INFO: Created a list called '+content[i]+'!')
             return
         else:
             curPath = dir_path
