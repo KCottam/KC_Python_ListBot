@@ -4,6 +4,7 @@ import os.path
 import sys
 import asyncio
 import shutil
+import subprocess
 
 client = discord.Client()
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/Content/'
@@ -51,7 +52,7 @@ async def on_message(message):
                 messageCurPath += content[i]+'/'
                 i += 1
             AddFolder(curPath+'/'+content[i+1])
-            await message.channel.send('INFO: Created a item called '+messageCurPath+content[i+1]+'!')
+            await message.channel.send('INFO: Created an item called '+messageCurPath+content[i+1]+'!')
             return
         else:
             await message.channel.send('ERROR: Bad syntax! You must use \"item\" in your command.')
@@ -70,15 +71,15 @@ async def on_message(message):
                 messageCurPath += content[i]+'/'
                 i += 1
             RemoveFolder(curPath+'/'+content[i+1])
-            await message.channel.send('INFO: Removed a item called '+messageCurPath+content[i+1]+'!')
+            await message.channel.send('INFO: Removed an item called '+messageCurPath+content[i+1]+'!')
             return
         else:
             await message.channel.send('ERROR: Bad syntax! You must use \"item\" in your command.')
             return
         return
-    elif content[0] == '!item':
-        os.system("tree -n -F -a Content | sed 's/├\|─\|│\|└/ /g' > items")
+    elif content[0] == '!list':
         await message.channel.send('Here is all of the items.')
+        os.system("tree Content -n -F -a | sed 's/├\|─\|│\|└/ /g' > items")
         f = open("items","r")
         line = f.readline()
         while line:
@@ -91,13 +92,8 @@ async def on_message(message):
         os.remove(os.path.dirname(os.path.realpath(__file__))+'/items')
         await message.channel.send('End of Content.')        
         print('End Command\n')
-        
-<<<<<<< HEAD
+        return
 f=open("/home/pi/KC_Python_ListBot/token.txt","r")
-token = f.readline();
-=======
-f=open("token.txt","r")
 token = f.readline()
->>>>>>> 07da2c909d88cf925ee3d9c0d89b30b856e4fefc
 f.close()
 client.run(token)
